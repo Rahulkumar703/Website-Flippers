@@ -58,3 +58,11 @@ export const validateInputs = (inputs, schema) => {
   }
 };
 
+
+export const ROLES = [
+  "ADMIN",
+  "USER",
+  "OWNER",
+  "AUTHOR"
+]
+
