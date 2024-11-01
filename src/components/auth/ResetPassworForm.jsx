@@ -16,7 +16,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { useState } from "react";
 import { ArrowLeft, Check, ChevronLeft } from "lucide-react";
 import { H3 } from "../ui/typography";
-import Link from "next/link";
+import { Link } from 'nextjs13-progress';
+
 
 const ResetPassworForm = () => {
 

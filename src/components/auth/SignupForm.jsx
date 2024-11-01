@@ -1,5 +1,5 @@
 'use client';
-import { loginSchema, signupSchema } from "@/zod/authSchema";
+import { signupSchema } from "@/zod/authSchema";
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
@@ -15,11 +15,18 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
-import Link from "next/link";
+import { Link } from 'nextjs13-progress';
+import { toast } from "sonner";
+import { signup } from "@/actions/auth";
+import { useRouter } from "next/navigation";
+
 
 const SignupForm = () => {
 
     const [passwordVisible, setPasswordVisible] = useState(false);
+    const [loading, setLoading] = useState(false);
+
+    const router = useRouter();
 
 
     const togglePasswordVisibility = () => {
@@ -37,14 +44,28 @@ const SignupForm = () => {
         },
     })
 
-    function onSubmit(values) {
-        console.log(values)
+    async function onSubmit(values) {
+        try {
+            setLoading(true);
+            const res = await signup(values);
+            toast[res.type](res.message);
+
+            if (res.success) {
+                router.replace('/login');
+            }
+
+        } catch (error) {
+            toast.error(error.message);
+        }
+        finally {
+            setLoading(false)
+        }
     }
 
     return (
         <Card className=" w-full max-w-md">
             <CardHeader>
-                <CardTitle>Login</CardTitle>
+                <CardTitle>Create an Account</CardTitle>
             </CardHeader>
             <CardContent>
                 <Form {...form}>
@@ -58,7 +79,7 @@ const SignupForm = () => {
                                     <FormItem>
                                         <FormLabel>First Name</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="Enter your first name" {...field} />
+                                            <Input disabled={loading} placeholder="Enter your first name" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -71,7 +92,7 @@ const SignupForm = () => {
                                     <FormItem>
                                         <FormLabel>Last Name</FormLabel>
                                         <FormControl>
-                                            <Input placeholder="Enter your last name" {...field} />
+                                            <Input disabled={loading} placeholder="Enter your last name" {...field} />
                                         </FormControl>
                                         <FormMessage />
                                     </FormItem>
@@ -85,7 +106,7 @@ const SignupForm = () => {
                                 <FormItem>
                                     <FormLabel>Email</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="Enter your email" {...field} />
+                                        <Input disabled={loading} type="email" placeholder="Enter your email" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -101,13 +122,13 @@ const SignupForm = () => {
                                     </FormLabel>
                                     <FormControl>
                                         <div className="relative">
-                                            <Input type={passwordVisible ? "text" : "password"} className="pr-12" placeholder="Re-enter your password" {...field} />
+                                            <Input disabled={loading} type={passwordVisible ? "text" : "password"} className="pr-12" placeholder="Re-enter your password" {...field} />
                                             {
                                                 passwordVisible ? (
-                                                    <Button onClick={togglePasswordVisibility} type="button" className="bg-accent hover:bg-input rounded-l-none border-input border absolute top-1/2 right-0 -translate-y-1/2" size="icon" variant="ghost">
+                                                    <Button disabled={loading} onClick={togglePasswordVisibility} type="button" className="bg-accent hover:bg-input rounded-l-none border-input border absolute top-1/2 right-0 -translate-y-1/2" size="icon" variant="ghost">
                                                         <EyeOff />
                                                     </Button>) : (
-                                                    <Button onClick={togglePasswordVisibility} type="button" className="bg-accent hover:bg-input rounded-l-none border-input border absolute top-1/2 right-0 -translate-y-1/2" size="icon" variant="ghost">
+                                                    <Button disabled={loading} onClick={togglePasswordVisibility} type="button" className="bg-accent hover:bg-input rounded-l-none border-input border absolute top-1/2 right-0 -translate-y-1/2" size="icon" variant="ghost">
                                                         <Eye />
                                                     </Button>
                                                 )
@@ -128,13 +149,13 @@ const SignupForm = () => {
                                     </FormLabel>
                                     <FormControl>
                                         <div className="relative">
-                                            <Input type={passwordVisible ? "text" : "password"} className="pr-12" placeholder="Enter your password" {...field} />
+                                            <Input disabled={loading} type={passwordVisible ? "text" : "password"} className="pr-12" placeholder="Enter your password" {...field} />
                                             {
                                                 passwordVisible ? (
-                                                    <Button onClick={togglePasswordVisibility} type="button" className="bg-accent hover:bg-input rounded-l-none border-input border absolute top-1/2 right-0 -translate-y-1/2" size="icon" variant="ghost">
+                                                    <Button disabled={loading} onClick={togglePasswordVisibility} type="button" className="bg-accent hover:bg-input rounded-l-none border-input border absolute top-1/2 right-0 -translate-y-1/2" size="icon" variant="ghost">
                                                         <EyeOff />
                                                     </Button>) : (
-                                                    <Button onClick={togglePasswordVisibility} type="button" className="bg-accent hover:bg-input rounded-l-none border-input border absolute top-1/2 right-0 -translate-y-1/2" size="icon" variant="ghost">
+                                                    <Button disabled={loading} onClick={togglePasswordVisibility} type="button" className="bg-accent hover:bg-input rounded-l-none border-input border absolute top-1/2 right-0 -translate-y-1/2" size="icon" variant="ghost">
                                                         <Eye />
                                                     </Button>
                                                 )
@@ -146,7 +167,7 @@ const SignupForm = () => {
                             )}
                         />
 
-                        <Button type="submit" className="w-full">Login</Button>
+                        <Button disabled={loading} type="submit" className="w-full">Create Account</Button>
                     </form>
                 </Form>
             </CardContent>

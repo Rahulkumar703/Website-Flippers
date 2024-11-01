@@ -53,7 +53,7 @@ const PricingPage = () => {
 
     return (
         <PageWrapper className={'items-center min-h-[calc(100svh-72px)] gap-10'}>
-            <H1 className={'mt-5 text-primary'}>Pricing</H1>
+            <H1 className={'text-primary'}>Pricing</H1>
             <div className="grid lg:grid-cols-3 md:grid-cols-2 grid-cols-1 justify-items-center gap-16 lg:gap-10">
                 {
                     pricings.map((pricing, index) => {

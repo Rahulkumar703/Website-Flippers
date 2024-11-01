@@ -1,0 +1,112 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  USER // User can sell and buy websites
+  OWNER // Owner can manage the website and users
+  AUTHOR // Author can publish blogs
+  ADMIN // Admin can approve and edit listings
+}
+
+model User {
+  id                String              @id @default(uuid())
+  firstName         String              @db.VarChar(255)
+  lastName          String              @db.VarChar(255)
+  emailVerified     DateTime?
+  email             String              @unique @db.VarChar(255)
+  phoneVerified     DateTime?
+  phone             String?             @unique @db.VarChar(255)
+  idVerified        DateTime?
+  password          String              @db.VarChar(255)
+  blog              Blog[]
+  Session           Session[]
+  verificationToken verificationToken[]
+  role              Role                @default(USER)
+  Listing           Listing[]
+}
+
+model Session {
+  id           String   @id @default(uuid())
+  createdAt    DateTime @default(now()) @db.Timestamp(6)
+  expiresAt    DateTime
+  sessionToken String   @unique
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+}
+
+model verificationToken {
+  id         String   @id @default(uuid())
+  identifier String
+  token      String   @unique
+  expires    DateTime
+  createdAt  DateTime @default(now()) @db.Timestamp(6)
+  userId     String?
+  user       User?    @relation(fields: [userId], references: [id])
+}
+
+model Blog {
+  id        String   @id @default(uuid())
+  title     String   @db.VarChar(255)
+  content   String?
+  published Boolean  @default(false)
+  authorId  String
+  user      User     @relation(fields: [authorId], references: [id])
+  tags      Tag[]    @relation("BlogTags")
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+  updatedAt DateTime @updatedAt @db.Timestamp(6)
+}
+
+model Listing {
+  id                     String       @id @default(uuid())
+  url                    String       @db.VarChar(255) // URL of the website
+  price                  Float
+  userId                 String
+  user                   User         @relation(fields: [userId], references: [id])
+  pinVerified            Boolean      @default(false)
+  paymentReceived        Boolean      @default(false)
+  websiteName            String       @db.VarChar(255)
+  websiteType            String       @db.VarChar(255) // e.g., "Established Website"
+  websiteStartingDate    DateTime
+  domainRenewalDate      DateTime
+  platform               String       @db.VarChar(100) // e.g., "WordPress"
+  niche                  String[]     @db.VarChar(255) // e.g., ["Technology", "Gaming"]
+  aboutWebsite           String       @db.Text
+  monetizationPlatform   String       @db.VarChar(255) // e.g., "Google Adsense"
+  siteMonetizationDate   DateTime
+  monetizationCountry    String       @db.VarChar(100) // e.g., "India"
+  monthlyEarning         Float?
+  expectedMonthlyTraffic Int?
+  lastMonthEarning       Float?
+  lastSixMonthEarning    Float?
+  images                 Screenshot[] // Relation to multiple images
+  keywords               Tag[]        @relation("ListingTags") // Relation to multiple tags
+  createdAt              DateTime     @default(now()) @db.Timestamp(6)
+  updatedAt              DateTime     @updatedAt @db.Timestamp(6)
+}
+
+model Tag {
+  id       Int       @id @default(autoincrement())
+  name     String
+  blogs    Blog[]    @relation("BlogTags")
+  listings Listing[] @relation("ListingTags") // Relation to multiple listings
+}
+
+model Screenshot {
+  id        String   @id @default(uuid())
+  url       String   @db.VarChar(255) // URL of the image
+  listingId String
+  listing   Listing  @relation(fields: [listingId], references: [id])
+  createdAt DateTime @default(now()) @db.Timestamp(6)
+}

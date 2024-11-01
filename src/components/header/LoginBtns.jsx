@@ -1,15 +1,21 @@
-import Link from "next/link";
+'use client';
+import { Link } from 'nextjs13-progress';
 import { Button } from "../ui/button";
 import { cn } from "@/lib/utils";
+import { signOut, useSession } from 'next-auth/react';
 
 const LoginBtns = ({ className }) => {
-    const loggedIn = false;
+
+    const session = useSession();
+    const loggedIn = session?.status === 'authenticated';
 
     return (
         <div className={cn("flex gap-2 items-center", className)}>
             {
                 loggedIn ? (
-                    <Button>Logout</Button>
+                    <Link href="/logout">
+                        <Button variant='destructive'>Logout</Button>
+                    </Link>
                 ) : (
                     <>
                         <Link href="/login" className="flex-1">

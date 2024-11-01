@@ -1,6 +1,6 @@
 "use client"
 
-import Link from "next/link"
+import { Link } from 'nextjs13-progress';
 import { useState } from "react"
 import { cn } from "@/lib/utils"
 import {
@@ -16,25 +16,8 @@ import { Menu } from "lucide-react"
 import LoginBtns from "./LoginBtns"
 import { Button } from "../ui/button"
 
-const navLinks = [
-    {
-        title: "Blog",
-        href: "/blog",
-        description: "Read our latest blog posts.",
-    },
-    {
-        title: "Pricing",
-        href: "/pricing",
-        description: "Pricing for all plans and services.",
-    },
-    {
-        title: "Services",
-        href: "/services",
-        description: "Services we offer.",
-    },
-]
 
-const Navbar = () => {
+const Navbar = ({ navLinks }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
     return (
@@ -46,45 +29,59 @@ const Navbar = () => {
                 <Menu className="w-6 h-6" />
             </Button>
             {isMobileMenuOpen && (
-                <div className={'flex flex-col items-center justify-between fixed top-[58px] bg-secondary right-0 h-[calc(100dvh-58px)] w-full max-w-sm gap-4 p-6'}>
-                    <NavigationMenu className="h-auto flex-[0] w-full">
-                        <NavigationMenuList className="flex-col items-center gap-4">
+                <div className={'flex flex-col items-center justify-between fixed top-[57.6px] bg-foreground/20 backdrop-blur-2xl shadow-lg right-0 h-[calc(100dvh-58px)] w-full max-w-sm gap-4 p-6'}>
+                    <nav className="h-auto flex-[0] w-full">
+                        <ul className="flex flex-col  gap-4" >
                             {
                                 navLinks.map((link, index) => {
                                     if (link?.submenu?.length) {
                                         return (
-                                            <NavigationMenuItem key={index} className="">
-                                                <NavigationMenuTrigger>{link.title}</NavigationMenuTrigger>
-                                                <NavigationMenuContent>
-                                                    <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] ">
-                                                        {
-                                                            link.submenu.map((item, index) => {
-                                                                return (
-                                                                    <ListItem key={index} href={item.href} title={item.title}>
-                                                                        {item.description}
-                                                                    </ListItem>
-                                                                )
-                                                            })
-                                                        }
-                                                    </ul>
-                                                </NavigationMenuContent>
-                                            </NavigationMenuItem>
+                                            <li key={index} className="">
+                                                <span className="font-bold underline">{link.title}</span>
+                                                <ul className="grid gap-3 pt-3 pl-3 md:w-[400px] lg:w-[500px] ">
+                                                    {
+                                                        link.submenu.map((item, index) => {
+                                                            return (
+
+                                                                <li key={index} onClick={() => setIsMobileMenuOpen(false)}>
+                                                                    <Link href={item.href}
+                                                                        className={cn(
+                                                                            "block select-none space-y-1 rounded-md px-4 py-2 leading-none no-underline outline-none transition-colors bg-background hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                                                                        )}
+                                                                    >
+                                                                        <div className="text-sm font-medium leading-none">{item.title}</div>
+                                                                        <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                                                                            {item.description}
+                                                                        </p>
+                                                                    </Link>
+                                                                </li>
+                                                            )
+                                                        })
+                                                    }
+                                                </ul>
+                                            </li>
                                         )
                                     }
                                     else
                                         return (
-                                            <NavigationMenuItem key={index}>
-                                                <Link href={link.href} legacyBehavior passHref>
-                                                    <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                                                        {link.title}
-                                                    </NavigationMenuLink>
+                                            <li key={index} onClick={() => setIsMobileMenuOpen(false)}>
+
+                                                <Link href={link.href}
+                                                    className={cn(
+                                                        "block select-none space-y-1 rounded-md px-4 py-2 leading-none no-underline outline-none transition-colors bg-background hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+                                                    )}
+                                                >
+                                                    <div className="text-sm font-medium leading-none">{link.title}</div>
+                                                    <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+                                                        {link.description}
+                                                    </p>
                                                 </Link>
-                                            </NavigationMenuItem>
+                                            </li>
                                         )
                                 })
                             }
-                        </NavigationMenuList>
-                    </NavigationMenu>
+                        </ul>
+                    </nav>
                     <LoginBtns className={'flex-wrap gap-4 w-full'} />
                 </div>
             )
@@ -93,7 +90,7 @@ const Navbar = () => {
     )
 }
 
-const DesktopNavbar = () => (
+const DesktopNavbar = ({ navLinks }) => (
     <div className="hidden sm:flex flex-1 justify-between">
         <NavigationMenu>
             <NavigationMenuList>
@@ -122,10 +119,8 @@ const DesktopNavbar = () => (
                         else
                             return (
                                 <NavigationMenuItem key={index}>
-                                    <Link href={link.href} legacyBehavior passHref>
-                                        <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                                            {link.title}
-                                        </NavigationMenuLink>
+                                    <Link href={link.href} className={navigationMenuTriggerStyle()}>
+                                        {link.title}
                                     </Link>
                                 </NavigationMenuItem>
                             )
@@ -134,7 +129,7 @@ const DesktopNavbar = () => (
             </NavigationMenuList>
         </NavigationMenu>
         <LoginBtns />
-    </div>
+    </div >
 )
 export const ListItem = ({ className, title, children, ...props }, ref) => {
     return (
@@ -160,11 +155,11 @@ export const ListItem = ({ className, title, children, ...props }, ref) => {
 
 ListItem.displayName = "ListItem"
 
-export default function ResponsiveNavbar() {
+export default function ResponsiveNavbar({ navLinks }) {
     return (
         <>
-            <Navbar />
-            <DesktopNavbar />
+            <Navbar navLinks={navLinks} />
+            <DesktopNavbar navLinks={navLinks} />
         </>
     )
 }

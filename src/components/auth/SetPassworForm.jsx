@@ -13,6 +13,7 @@ import {
 import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { setPasswordSchema } from "@/zod/authSchema";
+import { Link } from "nextjs13-progress";
 
 const SetPassworForm = () => {
 
@@ -73,7 +74,7 @@ const SetPassworForm = () => {
 
             </CardContent>
             <CardFooter>
-                <CardDescription className="mx-auto">Back to  <a href="/login" className="text-blue-500 hover:text-primary hover:underline">Login</a></CardDescription>
+                <CardDescription className="mx-auto">Back to  <Link href="/login" className="text-blue-500 hover:text-primary hover:underline">Login</Link></CardDescription>
             </CardFooter>
         </Card>
     )

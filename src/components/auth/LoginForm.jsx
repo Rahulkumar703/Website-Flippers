@@ -15,11 +15,18 @@ import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "../ui/card";
 import { Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
-import Link from "next/link";
+import { Link } from 'nextjs13-progress';
+import { signIn } from "next-auth/react";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
+
 
 const LoginForm = () => {
 
     const [passwordVisible, setPasswordVisible] = useState(false);
+    const [loading, setLoading] = useState(false);
+
+    const router = useRouter();
 
 
     const togglePasswordVisibility = () => {
@@ -34,8 +41,27 @@ const LoginForm = () => {
         },
     })
 
-    function onSubmit(values) {
-        console.log(values)
+    async function onSubmit(values) {
+        try {
+            setLoading(true);
+            const res = await signIn("credentials", {
+                email: values.email,
+                password: values.password,
+                redirect: false
+            });
+
+            if (res.error) {
+                return toast.error(res.error);
+            }
+
+            router.replace('/');
+
+        } catch (error) {
+            toast.error(error.message)
+        }
+        finally {
+            setLoading(false)
+        }
     }
 
     return (
@@ -53,7 +79,7 @@ const LoginForm = () => {
                                 <FormItem>
                                     <FormLabel>Email</FormLabel>
                                     <FormControl>
-                                        <Input placeholder="Enter your email" {...field} />
+                                        <Input disabled={loading} type="email" placeholder="Enter your email" {...field} />
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>
@@ -64,18 +90,16 @@ const LoginForm = () => {
                             name="password"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>
-                                        Password
-                                    </FormLabel>
+                                    <FormLabel>Password</FormLabel>
                                     <FormControl>
                                         <div className="relative">
                                             <Input type={passwordVisible ? "text" : "password"} className="pr-12" placeholder="Enter your password" {...field} />
                                             {
                                                 passwordVisible ? (
-                                                    <Button onClick={togglePasswordVisibility} type="button" className="bg-accent hover:bg-input rounded-l-none border-input border absolute top-1/2 right-0 -translate-y-1/2" size="icon" variant="ghost">
+                                                    <Button disabled={loading} onClick={togglePasswordVisibility} type="button" className="bg-accent hover:bg-input rounded-l-none border-input border absolute top-1/2 right-0 -translate-y-1/2" size="icon" variant="ghost">
                                                         <EyeOff />
                                                     </Button>) : (
-                                                    <Button onClick={togglePasswordVisibility} type="button" className="bg-accent hover:bg-input rounded-l-none border-input border absolute top-1/2 right-0 -translate-y-1/2" size="icon" variant="ghost">
+                                                    <Button disabled={loading} onClick={togglePasswordVisibility} type="button" className="bg-accent hover:bg-input rounded-l-none border-input border absolute top-1/2 right-0 -translate-y-1/2" size="icon" variant="ghost">
                                                         <Eye />
                                                     </Button>
                                                 )
@@ -88,7 +112,7 @@ const LoginForm = () => {
                         />
 
                         <CardDescription className="mr-auto"><Link href="/reset-password" className="text-blue-500 hover:text-primary hover:underline">Forgot Password?</Link></CardDescription>
-                        <Button type="submit" className="w-full">Login</Button>
+                        <Button disabled={loading} type="submit" className="w-full">Login</Button>
                     </form>
                 </Form>
             </CardContent>
